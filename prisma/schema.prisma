@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Farmers who join the platform (free)
+model Farmer {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  phone         String?
+  county        String
+  farmSizeAcres Float?
+  crops         String // comma-separated list of crops grown
+  exportReady   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+// Buyers who join the platform (free)
+model Buyer {
+  id        String   @id @default(cuid())
+  name      String
+  company   String
+  email     String   @unique
+  country   String
+  crops     String // comma-separated list of crops of interest
+  website   String?
+  createdAt DateTime @default(now())
+}
+
+// Produce listings created by farmers
+model Listing {
+  id             String   @id @default(cuid())
+  farmerName     String
+  farmerContact  String
+  county         String
+  crop           String
+  variety        String?
+  quantity       Float
+  unit           String
+  price          Float
+  currency       String   @default("KES")
+  certifications String?
+  description    String?
+  harvestWindow  String?
+  status         String   @default("active")
+  createdAt      DateTime @default(now())
+}
+
+// Purchase requests posted by buyers
+model BuyerRequest {
+  id          String   @id @default(cuid())
+  buyerName   String
+  company     String
+  country     String
+  crop        String
+  quantity    String
+  targetPrice String
+  incoterm    String
+  notes       String?
+  createdAt   DateTime @default(now())
+}
