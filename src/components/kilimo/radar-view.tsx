@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Accordion,
@@ -19,6 +18,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { RISK_ALERTS, SEVERITY_STYLES, CATEGORY_LABELS } from "@/lib/data";
+import { severityOrder } from "@/lib/utils";
 import type { AlertCategory, RiskAlert } from "@/lib/data";
 import {
   ChevronDown,
@@ -271,8 +271,4 @@ function AlertCard({ alert }: { alert: RiskAlert }) {
       </CardContent>
     </Card>
   );
-}
-
-function severityOrder(s: string): number {
-  return s === "high" ? 3 : s === "opportunity" ? 2.5 : s === "medium" ? 2 : 1;
 }

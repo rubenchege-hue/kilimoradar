@@ -30,6 +30,11 @@ export function Footer({ onNavigate }: { onNavigate: (v: ViewId) => void }) {
                 </button>
               </li>
               <li>
+                <button className="hover:text-foreground" onClick={() => onNavigate("weather")}>
+                  Seasonal Weather
+                </button>
+              </li>
+              <li>
                 <button className="hover:text-foreground" onClick={() => onNavigate("markets")}>
                   Export Markets &amp; Prices
                 </button>

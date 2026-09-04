@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
+import { webSearch } from "@/lib/ai";
 
 interface NewsItem {
   id: string;
@@ -11,16 +11,6 @@ interface NewsItem {
   relevance: "high" | "medium";
 }
 
-interface NewsResult {
-  name: string;
-  title?: string;
-  url: string;
-  snippet?: string;
-  host_name?: string;
-  date?: string;
-}
-
-// Simple in-memory cache (30 min) so we don't hit search on every visit
 const CACHE_TTL = 30 * 60 * 1000;
 let cache: { at: number; items: NewsItem[] } | null = null;
 
@@ -44,22 +34,10 @@ const HIGH_SIGNAL = [
   "trade",
 ];
 
-function scoreRelevance(item: NewsResult): "high" | "medium" {
-  const text = `${item.name ?? ""} ${item.title ?? ""} ${item.snippet ?? ""}`.toLowerCase();
+function scoreRelevance(item: { title: string; snippet: string; source: string }): "high" | "medium" {
+  const text = `${item.source ?? ""} ${item.title ?? ""} ${item.snippet ?? ""}`.toLowerCase();
   const hits = HIGH_SIGNAL.filter((kw) => text.includes(kw)).length;
   return hits >= 3 ? "high" : "medium";
-}
-
-function toNewsItem(item: NewsResult, idx: number): NewsItem {
-  return {
-    id: `${item.host_name ?? "news"}-${idx}`,
-    title: item.name ?? item.title ?? "News",
-    url: item.url,
-    snippet: item.snippet ?? "",
-    source: item.host_name ?? "web",
-    date: item.date ?? "",
-    relevance: scoreRelevance(item),
-  };
 }
 
 export async function GET() {
@@ -68,16 +46,14 @@ export async function GET() {
   }
 
   try {
-    const zai = await ZAI.create();
-
     const queries = [
-      { query: "Kenya agricultural exports geopolitics trade news", num: 8 },
-      { query: "Kenya farmers fertilizer shipping export market news", num: 6 },
-      { query: "Kenya tea coffee avocado flowers export news", num: 6 },
+      "Kenya agricultural exports geopolitics trade news",
+      "Kenya farmers fertilizer shipping export market news",
+      "Kenya tea coffee avocado flowers export news",
     ];
 
     const settled = await Promise.allSettled(
-      queries.map((q) => zai.functions.invoke("web_search", q))
+      queries.map((q) => webSearch(q, 8))
     );
 
     const seen = new Set<string>();
@@ -85,15 +61,22 @@ export async function GET() {
 
     for (const result of settled) {
       if (result.status !== "fulfilled" || !Array.isArray(result.value)) continue;
-      (result.value as NewsResult[]).forEach((item, idx) => {
+      result.value.forEach((item, idx) => {
         if (!item.url || seen.has(item.url)) return;
-        if (!item.name && !item.title) return;
+        if (!item.title) return;
         seen.add(item.url);
-        merged.push(toNewsItem(item, `${merged.length}-${idx}`));
+        merged.push({
+          id: `${item.source ?? "news"}-${merged.length}-${idx}`,
+          title: item.title,
+          url: item.url,
+          snippet: item.snippet ?? "",
+          source: item.source ?? "web",
+          date: item.date ?? "",
+          relevance: scoreRelevance(item),
+        });
       });
     }
 
-    // Dedupe by title similarity as well
     const titleSeen = new Set<string>();
     const deduped = merged.filter((item) => {
       const key = (item.title ?? "").toLowerCase().slice(0, 60);
@@ -102,7 +85,6 @@ export async function GET() {
       return true;
     });
 
-    // High relevance first, keep top 12
     const sorted = deduped
       .sort((a, b) => {
         if (a.relevance !== b.relevance) return a.relevance === "high" ? -1 : 1;

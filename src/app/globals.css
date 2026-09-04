@@ -130,6 +130,46 @@
   }
 }
 
+/* Hero entrance animations */
+@keyframes hero-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-anim {
+  opacity: 0;
+  animation: hero-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-delay-1 {
+  animation-delay: 0.1s;
+}
+.hero-delay-2 {
+  animation-delay: 0.25s;
+}
+.hero-delay-3 {
+  animation-delay: 0.4s;
+}
+.hero-delay-4 {
+  animation-delay: 0.55s;
+}
+.hero-delay-5 {
+  animation-delay: 0.7s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-anim {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 .animate-ticker {
   animation: ticker-scroll 45s linear infinite;
 }

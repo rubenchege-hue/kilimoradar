@@ -60,6 +60,14 @@ export interface CountyInfo {
   mainCrops: string[];
 }
 
+export const COUNTRIES = [
+  "Kenya", "Netherlands", "China", "United Arab Emirates", "United Kingdom",
+  "Germany", "Pakistan", "United States", "France", "Egypt", "Saudi Arabia",
+  "India", "South Africa", "Uganda", "Tanzania", "Rwanda", "Other",
+] as const;
+
+export const INCOTERMS = ["EXW", "FOB", "CFR", "CIF", "DAP"] as const;
+
 export const CROPS = [
   "Tea",
   "Coffee",
@@ -79,15 +87,22 @@ export const CROPS = [
   "Onion",
   "Tomato",
   "Irish Potato",
+  "Rosemary",
+  "Thyme",
+  "Basil",
+  "Mint",
+  "Coriander",
+  "Sage",
+  "Oregano",
 ] as const;
 
 export const COUNTIES: CountyInfo[] = [
-  { name: "Nakuru", mainCrops: ["Tea", "Coffee", "Macadamia", "Cut Flowers"] },
+  { name: "Nakuru", mainCrops: ["Tea", "Coffee", "Macadamia", "Cut Flowers", "Herbs"] },
   { name: "Kiambu", mainCrops: ["Coffee", "Avocado", "Cut Flowers", "French Beans"] },
   { name: "Muranga", mainCrops: ["Avocado", "Coffee", "Macadamia", "Tea"] },
-  { name: "Nyeri", mainCrops: ["Coffee", "Tea", "Macadamia", "Dairy"] },
+  { name: "Nyeri", mainCrops: ["Coffee", "Tea", "Macadamia", "Dairy", "Herbs"] },
   { name: "Meru", mainCrops: ["Avocado", "Banana", "Miraa", "Tea"] },
-  { name: "Kirinyaga", mainCrops: ["French Beans", "Rice", "Tomato", "Avocado"] },
+  { name: "Kirinyaga", mainCrops: ["French Beans", "Rice", "Tomato", "Avocado", "Herbs"] },
   { name: "Embú", mainCrops: ["Coffee", "Tea", "Avocado", "Macadamia"] },
   { name: "Machakos", mainCrops: ["Mango", "Avocado", "Sesame", "Dairy"] },
   { name: "Makueni", mainCrops: ["Mango", "Avocado", "Sesame", "Green Gram"] },
@@ -102,7 +117,7 @@ export const COUNTIES: CountyInfo[] = [
   { name: "Kisii", mainCrops: ["Tea", "Banana", "Avocado", "Dairy"] },
   { name: "Kilifi", mainCrops: ["Cashew Nut", "Coconut", "Mango", "Chilli"] },
   { name: "Mombasa", mainCrops: ["Chilli", "Coconut", "Cashew Nut"] },
-  { name: "Laikipia", mainCrops: ["Wheat", "Dairy", "Avocado", "Cut Flowers"] },
+  { name: "Laikipia", mainCrops: ["Wheat", "Dairy", "Avocado", "Cut Flowers", "Herbs"] },
   { name: "Nairobi", mainCrops: ["Cut Flowers", "Vegetables", "Dairy"] },
   { name: "Kajiado", mainCrops: ["Dairy", "Onion", "Tomato"] },
   { name: "Narok", mainCrops: ["Wheat", "Maize", "Irish Potato"] },
@@ -202,6 +217,21 @@ export const COMMODITIES: Commodity[] = [
     trend: [98, 97, 96, 97, 95, 94, 95, 93, 94, 93, 94, 95],
     topMarkets: ["UK", "Netherlands", "France", "Germany"],
     note: "Fine beans & snow peas core to EU/UK supermarket programs. Pesticide MRL limits are the #1 rejection cause — KenyaGAP certification essential.",
+    season: "Year-round (irrigated)",
+  },
+  {
+    id: "herbs",
+    name: "Herbs & Spices",
+    emoji: "🌿",
+    exportValue: "$35M+",
+    rank: 7,
+    unit: "kg (dried premium)",
+    price: 145,
+    currency: "KES",
+    changePct: 3.9,
+    trend: [128, 130, 129, 133, 135, 134, 138, 140, 139, 142, 143, 145],
+    topMarkets: ["UK", "Netherlands", "Germany", "France", "USA"],
+    note: "Grown in Kenya's highlands, fresh herbs fly to EU/UK supermarkets while dried rosemary, thyme and oregano fetch premium bulk prices. MRL compliance is the #1 buyer gate.",
     season: "Year-round (irrigated)",
   },
 ];
@@ -496,3 +526,134 @@ export const SEVERITY_STYLES: Record<
     dot: "bg-emerald-500",
   },
 };
+
+// ─────────────────────────────────────────────────────────────
+// Seasonal / weather intelligence for export markets
+// Helps Kenyan farmers understand when NOT to export
+// ─────────────────────────────────────────────────────────────
+
+export type Hemisphere = "northern" | "southern" | "tropical";
+
+export interface MarketSeason {
+  id: string;
+  name: string;
+  flag: string;
+  hemisphere: Hemisphere;
+  /** Months (1-12) when local supply peaks and Kenyan exports face tough competition */
+  peakLocalSupply: number[];
+  /** Months (1-12) when demand for imports is highest */
+  peakImportDemand: number[];
+  /** Key crops this market buys from Kenya */
+  keyCrops: string[];
+  /** What's happening in the market right now — plain-language summary */
+  currentNote: string;
+  /** How this affects Kenyan exports right now */
+  impact: "favourable" | "neutral" | "unfavourable";
+}
+
+export const MARKET_SEASONS: MarketSeason[] = [
+  {
+    id: "eu",
+    name: "European Union",
+    flag: "🇪🇺",
+    hemisphere: "northern",
+    peakLocalSupply: [6, 7, 8, 9],      // Jun–Sep summer harvest
+    peakImportDemand: [11, 12, 1, 2, 3], // Nov–Mar winter
+    keyCrops: ["Cut Flowers", "Avocado", "French Beans", "Coffee", "Macadamia", "Fresh Herbs"],
+    currentNote: "EU summer means local vegetables and soft fruit are flooding their markets — import demand for Kenyan produce drops.",
+    impact: "unfavourable",
+  },
+  {
+    id: "uk",
+    name: "United Kingdom",
+    flag: "🇬🇧",
+    hemisphere: "northern",
+    peakLocalSupply: [6, 7, 8, 9],
+    peakImportDemand: [11, 12, 1, 2, 3],
+    keyCrops: ["Cut Flowers", "French Beans", "Coffee", "Avocado", "Fresh Herbs"],
+    currentNote: "UK grows its own soft fruit and beans in summer. Wait for autumn/winter when supermarket shelves need Kenyan supply.",
+    impact: "unfavourable",
+  },
+  {
+    id: "china",
+    name: "China",
+    flag: "🇨🇳",
+    hemisphere: "northern",
+    peakLocalSupply: [6, 7, 8, 9, 10],
+    peakImportDemand: [12, 1, 2, 3, 4],
+    keyCrops: ["Avocado", "Macadamia", "Tea", "Coffee", "Sesame"],
+    currentNote: "China's own avocado and fruit harvest peaks in summer. Winter and Chinese New Year drive the strongest import demand.",
+    impact: "unfavourable",
+  },
+  {
+    id: "usa",
+    name: "United States",
+    flag: "🇺🇸",
+    hemisphere: "northern",
+    peakLocalSupply: [5, 6, 7, 8, 9],
+    peakImportDemand: [11, 12, 1, 2, 3],
+    keyCrops: ["Macadamia", "Coffee", "Tea", "Cut Flowers"],
+    currentNote: "US domestic produce peaks late spring through early autumn. AGOA duty-free gives Kenyan products an edge, but summer competition is still stiff.",
+    impact: "unfavourable",
+  },
+  {
+    id: "uae",
+    name: "United Arab Emirates",
+    flag: "🇦🇪",
+    hemisphere: "tropical",
+    peakLocalSupply: [],
+    peakImportDemand: [1, 2, 3, 4, 10, 11, 12],
+    keyCrops: ["Tea", "Coffee", "Fresh Produce"],
+    currentNote: "UAE imports nearly all its food. Extreme summer heat (Jun–Sep) suppresses demand for fresh produce but tea/coffee are year-round.",
+    impact: "neutral",
+  },
+  {
+    id: "netherlands",
+    name: "Netherlands",
+    flag: "🇳🇱",
+    hemisphere: "northern",
+    peakLocalSupply: [5, 6, 7, 8, 9],
+    peakImportDemand: [10, 11, 12, 1, 2, 3, 4],
+    keyCrops: ["Cut Flowers", "Avocado", "French Beans", "Macadamia", "Fresh Herbs"],
+    currentNote: "Dutch greenhouses supply Europe's summer produce. Autumn–spring is when the Netherlands itself needs Kenyan flowers and beans.",
+    impact: "unfavourable",
+  },
+  {
+    id: "pakistan",
+    name: "Pakistan",
+    flag: "🇵🇰",
+    hemisphere: "tropical",
+    peakLocalSupply: [6, 7, 8, 9],
+    peakImportDemand: [10, 11, 12, 1, 2, 3, 4, 5],
+    keyCrops: ["Tea"],
+    currentNote: "Pakistan's tea demand is year-round (strong cultural demand). Pakistan is one of the most reliable markets — avoid shipping delays during monsoon (Jul–Aug).",
+    impact: "favourable",
+  },
+  {
+    id: "south-africa",
+    name: "South Africa",
+    flag: "🇿🇦",
+    hemisphere: "southern",
+    peakLocalSupply: [12, 1, 2, 3],     // Southern hemisphere summer
+    peakImportDemand: [6, 7, 8, 9],      // Southern hemisphere winter
+    keyCrops: ["Tea", "Coffee", "Fresh Produce"],
+    currentNote: "South Africa's own summer harvest peaks Dec–Mar. Their winter months (Jun–Sep) are when they need imports most.",
+    impact: "favourable",
+  },
+];
+
+/**
+ * Given a month (1-12), returns a market season with the computed
+ * `status` field indicating whether it's a good time to export.
+ */
+export function getMarketSeasonStatus(
+  market: MarketSeason,
+  month: number,
+): MarketSeason & { status: "good" | "okay" | "avoid" } {
+  const isPeakSupply = market.peakLocalSupply.includes(month);
+  const isPeakDemand = market.peakImportDemand.includes(month);
+
+  if (isPeakSupply) return { ...market, status: "avoid" };
+  if (isPeakDemand) return { ...market, status: "good" };
+  return { ...market, status: "okay" };
+}

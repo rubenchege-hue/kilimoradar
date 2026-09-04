@@ -11,6 +11,7 @@ import { MarketsView } from "@/components/kilimo/markets-view";
 import { MarketplaceView } from "@/components/kilimo/marketplace-view";
 import { JoinView } from "@/components/kilimo/join-view";
 import { AdvisorView } from "@/components/kilimo/advisor-view";
+import { WeatherView } from "@/components/kilimo/weather-view";
 
 function KilimoRadarApp() {
   const [activeView, setActiveView] = useState<ViewId>("home");
@@ -27,6 +28,7 @@ function KilimoRadarApp() {
       <main className="flex-1">
         {activeView === "home" && <HomeView onNavigate={navigate} />}
         {activeView === "radar" && <RadarView />}
+        {activeView === "weather" && <WeatherView />}
         {activeView === "markets" && <MarketsView />}
         {activeView === "marketplace" && <MarketplaceView />}
         {activeView === "join" && <JoinView />}

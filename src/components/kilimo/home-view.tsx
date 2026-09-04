@@ -9,7 +9,10 @@ import {
   KENYA_STATS,
   RISK_ALERTS,
   SEVERITY_STYLES,
+  MARKET_SEASONS,
+  getMarketSeasonStatus,
 } from "@/lib/data";
+import { severityOrder } from "@/lib/utils";
 import type { ViewId } from "./header";
 import {
   ArrowRight,
@@ -22,6 +25,8 @@ import {
   MessageSquareText,
   Store,
   Radar,
+  CloudSun,
+  CheckCircle2,
 } from "lucide-react";
 
 export function HomeView({ onNavigate }: { onNavigate: (v: ViewId) => void }) {
@@ -40,25 +45,25 @@ export function HomeView({ onNavigate }: { onNavigate: (v: ViewId) => void }) {
         <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16 lg:py-20">
           <div className="grid items-center gap-8 lg:grid-cols-2">
             <div>
-              <Badge variant="secondary" className="mb-4 gap-1.5">
+              <Badge variant="secondary" className="hero-anim hero-delay-1 mb-4 gap-1.5">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
                 </span>
                 Live geopolitical monitoring for your farm
               </Badge>
-              <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl leading-tight">
+              <h1 className="hero-anim hero-delay-2 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl leading-tight">
                 World events move your prices.
                 <span className="block text-primary">We help you move first.</span>
               </h1>
-              <p className="mt-4 max-w-xl text-base text-muted-foreground leading-relaxed">
+              <p className="hero-anim hero-delay-3 mt-4 max-w-xl text-base text-muted-foreground leading-relaxed">
                 A war in the Gulf raises your fertilizer. A shipping crisis
                 delays your buyer&apos;s payment. New China rules open duty-free
                 markets. Kilimo Radar translates what&apos;s happening in the
                 world into plain advice for your farm — and connects you
                 directly with buyers. <strong>Free, forever, for farmers and buyers.</strong>
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="hero-anim hero-delay-4 mt-6 flex flex-wrap gap-3">
                 <Button size="lg" onClick={() => onNavigate("join")}>
                   <Users className="h-4 w-4 mr-2" aria-hidden="true" />
                   Join as a farmer — Free
@@ -68,14 +73,14 @@ export function HomeView({ onNavigate }: { onNavigate: (v: ViewId) => void }) {
                   See today&apos;s alerts
                 </Button>
               </div>
-              <p className="mt-3 text-xs text-muted-foreground">
+              <p className="hero-anim hero-delay-5 mt-3 text-xs text-muted-foreground">
                 No fees. No commissions. No middlemen. Built for Kenyan
                 smallholders and the buyers who source from them.
               </p>
             </div>
 
             {/* Alert snapshot card */}
-            <Card className="relative">
+            <Card className="hero-anim hero-delay-3 relative">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Bell className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -134,7 +139,7 @@ export function HomeView({ onNavigate }: { onNavigate: (v: ViewId) => void }) {
           </Button>
         </div>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {COMMODITIES.slice(0, 6).map((c) => (
+          {COMMODITIES.map((c) => (
             <Card key={c.id} className="transition-shadow hover:shadow-md">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-2">
@@ -175,6 +180,9 @@ export function HomeView({ onNavigate }: { onNavigate: (v: ViewId) => void }) {
           ))}
         </div>
       </section>
+
+      {/* Seasonal intelligence snapshot */}
+      <SeasonalSnapshot onNavigate={onNavigate} />
 
       {/* How it works */}
       <section className="border-t border-border bg-card" aria-label="How the platform works">
@@ -220,10 +228,6 @@ export function HomeView({ onNavigate }: { onNavigate: (v: ViewId) => void }) {
   );
 }
 
-function severityOrder(s: string): number {
-  return s === "high" ? 3 : s === "medium" ? 2 : s === "low" ? 1 : 2.5;
-}
-
 function StatBlock({
   icon: Icon,
   label,
@@ -264,5 +268,78 @@ function FeatureCard({
       <h3 className="mt-3 font-semibold">{title}</h3>
       <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{description}</p>
     </div>
+  );
+}
+
+function SeasonalSnapshot({ onNavigate }: { onNavigate: (v: ViewId) => void }) {
+  const currentMonth = new Date().getMonth() + 1;
+  const enriched = MARKET_SEASONS.map((m) => getMarketSeasonStatus(m, currentMonth));
+  const favourable = enriched.filter((m) => m.status === "good").slice(0, 3);
+  const unfavourable = enriched.filter((m) => m.status === "avoid").slice(0, 3);
+
+  if (favourable.length === 0 && unfavourable.length === 0) return null;
+
+  return (
+    <section className="border-t border-border bg-card" aria-label="Seasonal intelligence">
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="flex items-center gap-2 text-xl font-bold sm:text-2xl">
+              <CloudSun className="h-5 w-5 text-primary" aria-hidden="true" />
+              Where to ship this month
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Don&apos;t ship into a local surplus. Target markets that need imports right now.
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" className="hidden sm:inline-flex" onClick={() => onNavigate("weather")}>
+            Full forecast <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+          </Button>
+        </div>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          {favourable.length > 0 && (
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4">
+              <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> Ship now — demand is high
+              </p>
+              <div className="space-y-2">
+                {favourable.map((m) => (
+                  <div key={m.id} className="flex items-start gap-2">
+                    <span className="text-base" aria-hidden="true">{m.flag}</span>
+                    <div>
+                      <p className="text-sm font-medium">{m.name}</p>
+                      <p className="text-xs text-emerald-600 leading-relaxed">{m.currentNote}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {unfavourable.length > 0 && (
+            <div className="rounded-xl border border-red-200 bg-red-50/50 p-4">
+              <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-red-700">
+                <TrendingDown className="h-3.5 w-3.5" aria-hidden="true" /> Hold off — local harvest is peaking
+              </p>
+              <div className="space-y-2">
+                {unfavourable.map((m) => (
+                  <div key={m.id} className="flex items-start gap-2">
+                    <span className="text-base" aria-hidden="true">{m.flag}</span>
+                    <div>
+                      <p className="text-sm font-medium">{m.name}</p>
+                      <p className="text-xs text-red-600 leading-relaxed">{m.currentNote}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="mt-4 text-center sm:hidden">
+          <Button variant="ghost" size="sm" onClick={() => onNavigate("weather")}>
+            Full seasonal forecast <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 }

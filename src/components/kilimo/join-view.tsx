@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { CROPS, COUNTIES } from "@/lib/data";
+import { CROPS, COUNTIES, COUNTRIES } from "@/lib/data";
 import {
   Sprout,
   Handshake,
@@ -26,12 +26,6 @@ import {
   Users,
   Globe2,
 } from "lucide-react";
-
-const COUNTRIES = [
-  "Kenya", "Netherlands", "China", "United Arab Emirates", "United Kingdom",
-  "Germany", "Pakistan", "United States", "France", "Egypt", "Saudi Arabia",
-  "India", "South Africa", "Uganda", "Tanzania", "Rwanda", "Other",
-];
 
 export function JoinView() {
   return (

@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 // Free registration for farmers and buyers
 export async function POST(req: NextRequest) {
+  const rl = checkRateLimit(req);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((rl.retryAfterMs ?? 60000) / 1000)) } }
+    );
+  }
+
   try {
     const body = await req.json();
     const { role, name, email, phone, county, farmSizeAcres, crops, company, country, website, exportReady } =

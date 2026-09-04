@@ -9,6 +9,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "./theme-toggle";
 import {
   Radar,
   Home,
@@ -18,13 +19,15 @@ import {
   MessageSquareText,
   Menu,
   Sprout,
+  CloudSun,
 } from "lucide-react";
 
-export type ViewId = "home" | "radar" | "markets" | "marketplace" | "join" | "advisor";
+export type ViewId = "home" | "radar" | "markets" | "marketplace" | "weather" | "join" | "advisor";
 
 const NAV_ITEMS: { id: ViewId; label: string; icon: React.ElementType }[] = [
   { id: "home", label: "Home", icon: Home },
   { id: "radar", label: "Geo Radar", icon: Radar },
+  { id: "weather", label: "Seasons", icon: CloudSun },
   { id: "markets", label: "Markets", icon: TrendingUp },
   { id: "marketplace", label: "Marketplace", icon: Store },
   { id: "advisor", label: "AI Advisor", icon: MessageSquareText },
@@ -83,6 +86,7 @@ export function Header({
 
         {/* Join CTA (desktop) */}
         <div className="ml-auto md:ml-0 flex items-center gap-2">
+          <ThemeToggle />
           <Button
             onClick={() => go("join")}
             size="sm"

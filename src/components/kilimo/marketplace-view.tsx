@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { CROPS, COUNTIES } from "@/lib/data";
+import { CROPS, COUNTIES, COUNTRIES, INCOTERMS } from "@/lib/data";
 import {
   Plus,
   MapPin,
@@ -69,14 +69,6 @@ interface BuyerRequest {
   notes: string | null;
   createdAt: string;
 }
-
-const COUNTRIES = [
-  "Kenya", "Netherlands", "China", "United Arab Emirates", "United Kingdom",
-  "Germany", "Pakistan", "United States", "France", "Egypt", "Saudi Arabia",
-  "India", "South Africa", "Uganda", "Tanzania", "Rwanda", "Other",
-];
-
-const INCOTERMS = ["EXW", "FOB", "CFR", "CIF", "DAP"];
 
 export function MarketplaceView() {
   const [tab, setTab] = useState<"produce" | "requests">("produce");

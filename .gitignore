@@ -52,3 +52,14 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# Local SQLite database (seeded at build/deploy, not committed)
+/db/custom.db
+/db/*.db-journal
+
+# Experimental / non-app folders
+/examples/
+/download/
+/mini-services/
+/scripts/*.png
+.zscripts/dev.pid
